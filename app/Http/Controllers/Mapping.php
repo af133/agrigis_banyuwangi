@@ -87,7 +87,7 @@ class Mapping extends Controller
             'nik' => 'required|string',   
         ]);
     
-        $petani = Petani::firstOrCreate(
+        $petani = Petani::updateOrCreate(
             ['nik' => $validated['nik']], 
             ['nmr_telpon' => $validated['nmr_telpon'], 'nama' => $validated['namaPetani']], // 
         );
