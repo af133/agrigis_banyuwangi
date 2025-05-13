@@ -3,7 +3,7 @@
       MENU
   </div>
 
-  <div class="px-4 py-6 space-y-4"> 
+  <div class="px-4 py-6 space-y-4">
     <div class="flex items-center space-x-3">
         <img src="{{ $img }}" alt="User" class="w-10 h-10 rounded-full" />
 
@@ -21,32 +21,57 @@
                   </div>
               </div>
     </div>
-    <x-nav-link href="{{ route('mapping') }}" :active="request()->is('mapping')">Mapping</x-nav-link>
-      @if ($status == 'Kepala Dinas' || $status == 'Staf')
-          <?php
-          $laporan = "Riwayat Pekerjaan";
-          if ($status == "Kepala Dinas") {
-              $laporan = "Laporan";
-          }
-          ?>
-          <x-nav-link :href="route('laporan', ['status' => $status])" :active="request()->is('laporan')">
-              {{ $laporan }}
-          </x-nav-link>
-      @endif
-
-      @if ($status == "Admin")
-          <x-nav-link href="{{ route('users.create') }}" :active="request()->is('tambahAkun')">Tambah Akun</x-nav-link>
-      @endif
-        @if ($status == 'Kepala Dinas')
-            <x-nav-link href="{{ route('notifications') }}" :active="request()->is('notifications')">Notifikasi</x-nav-link>
-        @endif
+<x-nav-link href="{{ route('mapping') }}" :active="request()->is('mapping')">
+    <div class="flex items-center space-x-2">
+        <img src="{{ asset('icons/location.png') }}" alt="Mapping Icon" class="w-5 h-5">
+        <span>Mapping</span>
+    </div>
+</x-nav-link>
+@if ($status == 'Kepala Dinas' || $status == 'Staf')
+    <?php
+    $laporan = $status == "Kepala Dinas" ? "Laporan" : "Riwayat Pekerjaan";
+    ?>
+    <x-nav-link :href="route('laporan', ['status' => $status])" :active="request()->is('laporan')">
+        <div class="flex items-center space-x-2">
+            <img src="{{ asset('icons/laporan.png') }}" alt="Laporan Icon" class="w-5 h-5">
+            <span>{{ $laporan }}</span>
+        </div>
+    </x-nav-link>
+@endif
 
 
-      <div >
-          <div class="mt-3 space-y-2 text-sm">
-              <x-nav-link href="{{route('profile')  }}" :active="request()->is('profile')">Akun Profil</x-nav-link>
-              <x-nav-link href="#" :active="request()->is('#')">Keluar</x-nav-link>
-          </div>
-      </div>
+@if ($status == "Admin")
+    <x-nav-link href="{{ route('users.create') }}" :active="request()->is('tambahAkun')">
+        <div class="flex items-center space-x-2">
+            <img src="{{ asset('icons/Add.png') }}" alt="Tambah Akun Icon" class="w-5 h-5">
+            <span>Tambah Akun</span>
+        </div>
+    </x-nav-link>
+@endif
+
+@if ($status == 'Kepala Dinas')
+    <x-nav-link href="{{ route('notifications') }}" :active="request()->is('notifications')">
+        <div class="flex items-center space-x-2">
+            <img src="{{ asset('icons/notification.png') }}" alt="Notifikasi Icon" class="w-5 h-5">
+            <span>Notifikasi</span>
+        </div>
+    </x-nav-link>
+@endif
+
+<div class="mt-3 space-y-2 text-sm">
+    <x-nav-link href="{{route('profile')}}" :active="request()->is('profile')">
+        <div class="flex items-center space-x-2">
+            <img src="{{ asset('icons/profile.png') }}" alt="Profil Icon" class="w-5 h-5">
+            <span>Akun Profil</span>
+        </div>
+    </x-nav-link>
+
+    <x-nav-link href="#" :active="request()->is('#')">
+        <div class="flex items-center space-x-2">
+            <img src="{{ asset('icons/Logout.png') }}" alt="Keluar Icon" class="w-5 h-5">
+            <span>Keluar</span>
+        </div>
+    </x-nav-link>
+</div>
   </div>
 </aside>
