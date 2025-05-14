@@ -29,7 +29,6 @@
 
       <div class="mt-3 space-y-2 text-sm">
         <x-nav-link href="{{ route('profile') }}" :active="request()->is('profile')">Akun Saya</x-nav-link>
-        <x-nav-link href="#" :active="request()->is('#')">Pengaturan</x-nav-link>
       </div>
 
       @if($status == 'Kepala Dinas' || $status == 'Staf')
@@ -49,7 +48,14 @@
         @endif
 
       <x-nav-link href="{{ route('mapping') }}" :active="request()->is('mapping')">Mapping</x-nav-link>
-      <x-nav-link href="#" :active="request()->is('#')">Keluar</x-nav-link>
+      <form method="POST" action="{{ route('logout') }}" id="logout-form">
+    @csrf
+    <button type="submit" class="w-full text-left">
+        <x-nav-link :active="request()->is('logout')">
+            Keluar
+        </x-nav-link>
+    </button>
+</form>
     </div>
   </div>
 </nav>
