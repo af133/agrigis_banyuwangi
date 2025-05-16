@@ -16,7 +16,7 @@
     @endif
 
     <div class="flex justify-center w-full">
-        <form id="akunForm" action="{{ route('profil.update') }}" method="POST" enctype="multipart/form-data" class="space-y-5 w-[60%] ">
+        <form id="akunForm" action="{{ route('profil.update') }}" method="POST" enctype="multipart/form-data" class="space-y-5 w-[60%]">
             @csrf
 
             {{-- Foto Profil --}}
@@ -52,10 +52,10 @@
             {{-- Password --}}
             <div>
                 <label class="block text-sm text-gray-700 mb-1">Password</label>
-              <input type="password" name="password" id="password" readonly
-       class="editable w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-600"
-       style="background-color: #DDFFAC; border-color: #727272;"
-       placeholder="Isi jika ingin ganti password">
+                <input type="password" name="password" id="password" readonly
+                       class="editable w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-600"
+                       style="background-color: #DDFFAC; border-color: #727272;"
+                       placeholder="Isi jika ingin ganti password">
             </div>
 
             {{-- Nomor Telepon --}}
@@ -94,6 +94,15 @@
     </div>
 </div>
 
+
+<!-- Popup Sukses -->
+<div id="successPopup"
+     class="fixed inset-0 bg-gray-800/25 flex items-center justify-center z-50 hidden">
+  <div class="bg-[#DDFFAC] text-black px-8 py-10 rounded-md shadow-lg max-w-md w-full text-center border border-black">
+    Data akun berhasil dirubah
+  </div>
+</div>
+
 {{-- Script --}}
 <script>
     const formInputs = ['name', 'path_img', 'password', 'nmr_telpon'];
@@ -104,7 +113,8 @@
 
     const originalData = {};
     formInputs.forEach(id => {
-        originalData[id] = document.getElementById(id)?.value || '';
+        const input = document.getElementById(id);
+        originalData[id] = input?.value || '';
     });
 
     editBtn.addEventListener('click', () => {
@@ -130,16 +140,23 @@
         cancelBtn.classList.add('hidden');
     });
 
-    form.addEventListener('submit', function (e) {
-        const confirmation = confirm('Apakah data yang diubah sudah sesuai?');
-        if (!confirmation) {
-            e.preventDefault();
-            return;
-        }
-
-        setTimeout(() => {
-            window.location.href = "{{ route('profile') }}";
-        }, 500);
+saveBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const res = await fetch(form.action, {
+        method: form.method,
+        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        body: formData
     });
+    if (res.ok) {
+        const success = document.getElementById('successPopup');
+        success.classList.remove('hidden');
+        success.addEventListener('click', () => {
+            window.location.href = "{{ route('profile') }}";
+        }, { once: true });
+    } else {
+        alert('Gagal menyimpan profil.');
+    }
+});
 </script>
 @endsection
