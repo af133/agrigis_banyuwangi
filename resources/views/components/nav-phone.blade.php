@@ -43,9 +43,17 @@
       @if($status == "Admin")
         <x-nav-link :href="route('users.create')" :active="request()->is('tambahAkun')">Tambah Akun</x-nav-link>
       @endif
-              @if ($status == 'Kepala Dinas')
-            <x-nav-link href="{{ route('notifications') }}" :active="request()->is('notifications')">Notifikasi</x-nav-link>
-        @endif
+
+@if ($status == 'Kepala Dinas')
+    <x-nav-link href="{{ route('notifications') }}" :active="request()->is('notifications')">
+        <div class="relative inline-block">
+            Notifikasi
+            @if(session('notification_count', 0) > 0)
+                <span class="absolute -top-1 -right-2 w-3 h-3 bg-red-600 rounded-full"></span>
+            @endif
+        </div>
+    </x-nav-link>
+@endif
 
       <x-nav-link href="{{ route('mapping') }}" :active="request()->is('mapping')">Mapping</x-nav-link>
       <form method="POST" action="{{ route('logout') }}" id="logout-form">

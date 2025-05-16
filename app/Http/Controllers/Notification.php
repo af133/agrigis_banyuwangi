@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\LaporanMapping;
+use App\Models\LaporanMappingRead;
 class Notification extends Controller
 {
     public function redirectToMapping(Request $request)
@@ -42,54 +43,29 @@ class Notification extends Controller
             'status_tanam' => $statusTanam,
         ];
     }
-    public function showNotification()
-    {
-        // Ambil data pengguna dari sesi
-        $dataUser = session('dataUser');
+public function showNotification()
+{
+    $userId = session('dataUser')['id'];
 
-        // Tentukan query dasar untuk mengambil data LaporanMapping dengan relasi
-        $mappingQuery = LaporanMapping::with([
-            'akun',
-            'petani',
-            'pemetaanLahan',
-            'pemetaanLahan.lahan',
-            'pemetaanLahan.tanaman'
+    // Ambil semua laporan yang belum dibaca
+    $unreadLaporan = LaporanMapping::whereDoesntHave('readers', function ($query) use ($userId) {
+        $query->where('akun_id', $userId);
+    })->get();
+
+    // Tandai semua sebagai sudah dibaca
+    foreach ($unreadLaporan as $laporan) {
+        LaporanMappingRead::create([
+            'laporan_mapping_id' => $laporan->id,
+            'akun_id' => $userId,
+            'is_read' => true
         ]);
-
-        // Cek status user
-        if ($dataUser['status'] == "Kepala Dinas") {
-            $mappings = $mappingQuery->get(); // ← Tambah get() di sini
-        } else {
-            $akunId = $dataUser['id'];
-            $mappings = $mappingQuery->where('akun_id', $akunId)->get();
-        }
-
-        $report = [];
-
-        // Proses data menjadi array
-        foreach ($mappings as $item) {
-            $report[] = $this->arrayMapping(
-                $item->akun->nama ?? '-',
-                $item->petani->nama ?? '-',
-                $item->petani->nik ?? '-',
-                $item->petani->nmr_telpon ?? '-',
-                $item->pemetaanLahan->alamat ?? '-',
-                $item->pemetaanLahan->luas_lahan ?? 0,
-                $item->pemetaanLahan->lat ?? 0,
-                $item->pemetaanLahan->lng ?? 0,
-                $item->pemetaanLahan->lahan->jenis_lahan ?? '-',
-                $item->pemetaanLahan->tanaman->nama_tanaman ?? '-',
-                $item->waktu_laporan ?? '-',
-                $item->pemetaanLahan->status_tanam ?? '-'
-            );
-        }
-
-        // Simpan hasil ke session
-        session(['report' => $report]);
-
-        return view('FolderNotifications.notifications');
     }
 
+    session(['notification_count' => 0]);
+
+    return view('FolderNotifications.notifications');
+;
+}
 
 
 

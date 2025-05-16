@@ -51,9 +51,14 @@
 
 @if ($status == 'Kepala Dinas')
     <x-nav-link href="{{ route('notifications') }}" :active="request()->is('notifications')">
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-2 relative">
             <img src="{{ asset('icons/notification.png') }}" alt="Notifikasi Icon" class="w-5 h-5">
             <span>Notifikasi</span>
+
+            {{-- Lingkaran merah indikator --}}
+            @if(session('notification_count', 0) > 0)
+                <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full"></span>
+            @endif
         </div>
     </x-nav-link>
 @endif
