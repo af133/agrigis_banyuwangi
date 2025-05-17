@@ -23,5 +23,8 @@ class LaporanMapping extends Model
     public function pemetaanLahan(){
         return $this->belongsTo(PemetaanLahan::class,'pemetaan_lahan_id');
     }
+    public function readers(){
+    return $this->hasMany(LaporanMappingRead::class, 'laporan_mapping_id');
+    }
 
 }
