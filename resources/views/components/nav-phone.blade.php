@@ -45,7 +45,7 @@
       @endif
 
 @if ($status == 'Kepala Dinas')
-    <x-nav-link href="{{ route('notifications') }}" :active="request()->is('notifications')">
+    <x-nav-link href="{{ route('notifications') }}" :active="request()->routeIs('notifications')">
         <div class="relative inline-block">
             Notifikasi
             @if(session('notification_count', 0) > 0)

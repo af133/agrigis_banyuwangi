@@ -50,7 +50,7 @@
 @endif
 
 @if ($status == 'Kepala Dinas')
-    <x-nav-link href="{{ route('notifications') }}" :active="request()->is('notifications')">
+    <x-nav-link href="{{ route('notifications') }}" :active="request()->routeIs('notifications')">
         <div class="flex items-center space-x-2 relative">
             <img src="{{ asset('icons/notification.png') }}" alt="Notifikasi Icon" class="w-5 h-5">
             <span>Notifikasi</span>
