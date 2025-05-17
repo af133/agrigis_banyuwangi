@@ -36,24 +36,24 @@ class Autentifikasi extends Controller
 
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|unique:akun,email',
-            'password' => 'required|min:8',
-            'status_id' => 'required|exists:status_pekerja,id',
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'email' => 'required|unique:akun,email',
+        'password' => 'required|min:8',
+        'status_id' => 'required|exists:status_pekerja,id',
+    ], [
+        'email.unique' => 'Email udah ada, ganti email yang baru!',
+    ]);
 
-        Akun::create([
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'status_id' => $request->status_id
+    Akun::create([
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'status_id' => $request->status_id
+    ]);
 
-        ]);
-
-        return redirect()->back()->with('success', 'User berhasil ditambahkan!');
-    }
-
+    return redirect()->back()->with('akun_success', true);
+}
 
     public function updateProfile(Request $request)
     {
@@ -62,9 +62,9 @@ class Autentifikasi extends Controller
 
         // Validasi inputan
         $request->validate([
-            'name' => 'nullable|string|max:255',
+            'name' => 'required|string|max:255',
             'password' => 'nullable|string|min:6',
-            'nmr_telpon' => 'nullable|string|max:15',
+            'nmr_telpon' => 'required|string|max:15',
             'path_img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
