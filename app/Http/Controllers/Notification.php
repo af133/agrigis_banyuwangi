@@ -45,28 +45,54 @@ class Notification extends Controller
     }
 public function showNotification()
 {
-    $userId = session('dataUser')['id'];
+    $dataUser = session('dataUser');
 
-    // Ambil semua laporan yang belum dibaca
-    $unreadLaporan = LaporanMapping::whereDoesntHave('readers', function ($query) use ($userId) {
-        $query->where('akun_id', $userId);
-    })->get();
+    $mappingQuery = LaporanMapping::with([
+        'akun',
+        'petani',
+        'pemetaanLahan',
+        'pemetaanLahan.lahan',
+        'pemetaanLahan.tanaman'
+    ]);
 
-    // Tandai semua sebagai sudah dibaca
-    foreach ($unreadLaporan as $laporan) {
-        LaporanMappingRead::create([
-            'laporan_mapping_id' => $laporan->id,
-            'akun_id' => $userId,
-            'is_read' => true
-        ]);
+    if ($dataUser['status'] == "Kepala Dinas") {
+        $mappings = $mappingQuery->get();
+    } else {
+        $akunId = $dataUser['id'];
+        $mappings = $mappingQuery->where('akun_id', $akunId)->get();
     }
 
+    $report = [];
+
+    foreach ($mappings as $item) {
+        $report[] = $this->arrayMapping(
+            $item->akun->nama ?? '-',
+            $item->petani->nama ?? '-',
+            $item->petani->nik ?? '-',
+            $item->petani->nmr_telpon ?? '-',
+            $item->pemetaanLahan->alamat ?? '-',
+            $item->pemetaanLahan->luas_lahan ?? 0,
+            $item->pemetaanLahan->lat ?? 0,
+            $item->pemetaanLahan->lng ?? 0,
+            $item->pemetaanLahan->lahan->jenis_lahan ?? '-',
+            $item->pemetaanLahan->tanaman->nama_tanaman ?? '-',
+            $item->waktu_laporan ?? '-',
+            $item->pemetaanLahan->status_tanam ?? '-'
+        );
+    }
+
+    session(['report' => $report]);
+
+    $idsToMarkRead = $mappings->where('is_read', false)->pluck('id')->toArray();
+    LaporanMapping::whereIn('id', $idsToMarkRead)->update(['is_read' => true]);
     session(['notification_count' => 0]);
 
+
+
+
     return view('FolderNotifications.notifications');
-;
 }
 
-
+   // Update se
 
 }

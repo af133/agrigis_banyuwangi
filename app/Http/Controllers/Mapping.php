@@ -50,7 +50,13 @@ public function showMapping()
         ->groupBy('pemetaan_lahan.lat', 'pemetaan_lahan.lng')
         ->pluck('id');
 
-    $mapping = LaporanMapping::with(['akun', 'petani', 'pemetaanLahan', 'pemetaanLahan.lahan', 'pemetaanLahan.tanaman'])
+    $mapping = LaporanMapping::with([
+            'akun',
+            'petani',
+            'pemetaanLahan',
+            'pemetaanLahan.lahan',
+            'pemetaanLahan.tanaman'
+        ])
         ->whereIn('id', $latestIds)
         ->get();
 
@@ -59,31 +65,27 @@ public function showMapping()
 
     foreach ($mapping as $item) {
         $result[] = $this->arrayMapping(
-            $item->akun->nama,
-            $item->petani->nama,
-            $item->petani->nik,
-            $item->petani->nmr_telpon,
-            $item->pemetaanLahan->alamat,
-            $item->pemetaanLahan->luas_lahan,
-            $item->pemetaanLahan->lat,
-            $item->pemetaanLahan->lng,
-            $item->pemetaanLahan->lahan->jenis_lahan,
-            $item->pemetaanLahan->tanaman->nama_tanaman,
-            $item->waktu_laporan,
-            $item->pemetaanLahan->status_tanam,
+            $item->akun->nama ?? '-',
+            $item->petani->nama ?? '-',
+            $item->petani->nik ?? '-',
+            $item->petani->nmr_telpon ?? '-',
+            $item->pemetaanLahan->alamat ?? '-',
+            $item->pemetaanLahan->luas_lahan ?? 0,
+            $item->pemetaanLahan->lat ?? 0,
+            $item->pemetaanLahan->lng ?? 0,
+            $item->pemetaanLahan->lahan->jenis_lahan ?? '-',
+            $item->pemetaanLahan->tanaman->nama_tanaman ?? '-',
+            $item->waktu_laporan ?? '-',
+            $item->pemetaanLahan->status_tanam ?? '-'
         );
 
-        // Cek apakah laporan ini sudah dibaca oleh akun ini
-        $sudahDibaca = \App\Models\LaporanMappingRead::where('akun_id', $akunId)
-            ->where('laporan_mapping_id', $item->id)
-            ->exists();
-
-        if (!$sudahDibaca) {
+        // Cek apakah laporan ini belum dibaca
+        if ($item->is_read == false) {
             $unreadCount++;
         }
     }
 
-    // Simpan notifikasi ke session (opsional)
+    // Simpan jumlah notifikasi yang belum dibaca ke session
     session(['notification_count' => $unreadCount]);
 
     return response()->json([
@@ -91,6 +93,7 @@ public function showMapping()
         'unread_count' => $unreadCount
     ]);
 }
+
 
     // --------------------------------------------------------------
     // -----------------------  Add Mapping  ------------------------

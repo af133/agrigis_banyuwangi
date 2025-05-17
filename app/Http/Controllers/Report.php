@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\LaporanMapping;
-use App\Models\LaporanMappingRead;
 class Report extends Controller
 {
     public function redirectToMapping(Request $request)
@@ -40,13 +39,12 @@ class Report extends Controller
             'jenis_lahan' => $jenisLahan,
             'nama_tanaman' => $namaTanaman,
             'waktu_laporan' => $waktuLaporan,
-            'status_tanam' => $statusTanam,
+            'status_tanam' => $statusTanam
         ];
     }
 public function showReport()
 {
     $dataUser = session('dataUser');
-    $userId = $dataUser['id'];
 
     $mappingQuery = LaporanMapping::with([
         'akun',
@@ -56,14 +54,15 @@ public function showReport()
         'pemetaanLahan.tanaman'
     ]);
 
+    // Ambil data berdasarkan status user
     if ($dataUser['status'] == "Kepala Dinas") {
         $mappings = $mappingQuery->get();
     } else {
-        $mappings = $mappingQuery->where('akun_id', $userId)->get();
+        $akunId = $dataUser['id'];
+        $mappings = $mappingQuery->where('akun_id', $akunId)->get();
     }
 
     $report = [];
-    $unreadCount = 0;
 
     foreach ($mappings as $item) {
         $report[] = $this->arrayMapping(
@@ -80,21 +79,18 @@ public function showReport()
             $item->waktu_laporan ?? '-',
             $item->pemetaanLahan->status_tanam ?? '-'
         );
-
-        $sudahDibaca = LaporanMappingRead::where('akun_id', $userId)
-                        ->where('laporan_mapping_id', $item->id)
-                        ->exists();
-
-        if (!$sudahDibaca) {
-            $unreadCount++;
-        }
     }
 
-    session(['report' => $report]);
+    // Hitung laporan yang belum dibaca
+    $unreadCount = $mappings->where('is_read', false)->count();
     session(['notification_count' => $unreadCount]);
+
+
+    session(['report' => $report]);
 
     return view('report.report');
 }
+
 
 
 }

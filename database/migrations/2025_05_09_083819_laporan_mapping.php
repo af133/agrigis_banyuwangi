@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        
         Schema::create('laporan_mapping', function (Blueprint $table) {
             $table->id();
             $table->foreignId('akun_id')->constrained('akun')->onDelete('cascade');
             $table->foreignId('petani_id')->constrained('petani')->onDelete('cascade');
             $table->foreignId('pemetaan_lahan_id')->constrained('pemetaan_lahan')->onDelete('cascade');
             $table->dateTime('waktu_laporan')->useCurrent();
+            $table->boolean('is_read')->default(false); // ← Tambahkan baris ini
         });
     }
 
