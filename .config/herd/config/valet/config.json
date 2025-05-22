@@ -1,0 +1,8 @@
+{
+    "tld": "test",
+    "loopback": "127.0.0.1",
+    "paths": [
+        "C:\\Users\\user\\Herd"
+    ],
+    "share-tool": "expose"
+}
