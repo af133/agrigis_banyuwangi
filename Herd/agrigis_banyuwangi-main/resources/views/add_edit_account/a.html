@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leaflet Draw Polygon</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- Leaflet Draw CSS & JS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+
+  <style>
+    #map {
+      height: 90vh;
+    }
+    .controls {
+      margin: 10px;
+    }
+    .controls button {
+      margin-right: 10px;
+      padding: 10px;
+      background-color: green;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .controls button:hover {
+      background-color: darkgreen;
+    }
+  </style>
+</head>
+<body>
+
+<div class="controls">
+  <button id="createPolygonBtn">Buat Poligon</button>
+  <button id="editPolygonBtn">Edit Poligon</button>
+  <button id="savePolygonBtn">Simpan</button>
+</div>
+
+<div id="map"></div>
+
+<script>
+  const map = L.map('map').setView([-8.2192, 114.3696], 14);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'Map data © OpenStreetMap contributors'
+  }).addTo(map);
+
+  const drawnItems = new L.FeatureGroup();
+  map.addLayer(drawnItems);
+
+  const drawControl = new L.Control.Draw({
+    edit: {
+      featureGroup: drawnItems,
+      edit: false, // default: off
+      remove: false
+    },
+    draw: {
+      polygon: {
+        allowIntersection: false,
+        showArea: true,
+        color: 'green'
+      },
+      polyline: false,
+      circle: false,
+      rectangle: false,
+      marker: false,
+      circlemarker: false
+    }
+  });
+
+  map.addControl(drawControl);
+
+  // Simpan referensi ke mode edit
+  let drawControlEdit = new L.EditToolbar.Edit(map, {
+    featureGroup: drawnItems
+  });
+
+  // Aktifkan mode buat poligon
+  document.getElementById('createPolygonBtn').addEventListener('click', () => {
+    const drawer = new L.Draw.Polygon(map, drawControl.options.draw.polygon);
+    drawer.enable();
+  });
+
+  // Aktifkan mode edit
+  document.getElementById('editPolygonBtn').addEventListener('click', () => {
+    drawControlEdit.enable();
+  });
+
+  // Simpan polygon (dalam kasus ini, cetak ke console)
+  document.getElementById('savePolygonBtn').addEventListener('click', () => {
+    drawControlEdit.disable();
+    drawnItems.eachLayer(layer => {
+      const coords = layer.getLatLngs();
+      console.log('Koordinat disimpan:', coords);
+      alert("Koordinat poligon telah disimpan! Lihat console.");
+    });
+  });
+
+  // Saat poligon dibuat
+  map.on(L.Draw.Event.CREATED, function (event) {
+    drawnItems.addLayer(event.layer);
+  });
+</script>
+
+</body>
+</html>
